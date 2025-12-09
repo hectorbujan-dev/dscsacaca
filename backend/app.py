@@ -27,6 +27,14 @@ db = client[DB_NAME]
 pokemon_collection = db[COLLECTION_NAME]
 users_collection = db['users']
 
+# Credenciales de administrador
+ADMIN_EMAIL = 'hectorbujan@gmail.com'
+ADMIN_PASSWORD = 'hector2005'
+
+def is_admin():
+    """Verificar si el usuario actual es admin"""
+    return session.get('user') == ADMIN_EMAIL and session.get('is_admin') == True
+
 # Crear índices para optimizar búsquedas
 try:
     pokemon_collection.create_index('id', unique=True)
@@ -54,7 +62,8 @@ def index():
                          tipos=sorted(tipos),
                          habitats=sorted([h for h in habitats if h]),
                          generaciones=sorted(generaciones),
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/buscar', methods=['GET', 'POST'])
 def buscar():
@@ -109,7 +118,8 @@ def buscar():
     return render_template('resultados.html', 
                          pokemons=resultados,
                          total=len(resultados),
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/pokemon/<int:pokemon_id>')
 def pokemon_detalle(pokemon_id):
@@ -129,7 +139,8 @@ def pokemon_detalle(pokemon_id):
     return render_template('pokemon.html', 
                          pokemon=pokemon,
                          en_equipo=en_equipo,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/comparar')
 def comparar():
@@ -153,7 +164,8 @@ def comparar():
                          pokemon1=pokemon1,
                          pokemon2=pokemon2,
                          todos_pokemon=todos_pokemon,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/estadisticas')
 def estadisticas():
@@ -199,6 +211,26 @@ def estadisticas():
         }}
     ]))
     
+    # NUEVA AGREGACIÓN: Top 10 combinado (suma de ambas estadísticas)
+    top_combinado = list(pokemon_collection.aggregate([
+        {'$addFields': {
+            'stat1_value': f'$stats.{stat1}',
+            'stat2_value': f'$stats.{stat2}',
+            'combined_score': {'$add': [f'$stats.{stat1}', f'$stats.{stat2}']}
+        }},
+        {'$sort': {'combined_score': -1}},
+        {'$limit': 10},
+        {'$project': {
+            'id': 1,
+            'name': 1,
+            'types': 1,
+            'img': 1,
+            'stat1_value': 1,
+            'stat2_value': 1,
+            'combined_score': 1
+        }}
+    ]))
+    
     # Agregación 2: Promedio de estadísticas por generación
     promedios_gen = list(pokemon_collection.aggregate([
         {'$group': {
@@ -238,13 +270,15 @@ def estadisticas():
     return render_template('estadisticas.html',
                          top_stat1=top_stat1,
                          top_stat2=top_stat2,
+                         top_combinado=top_combinado,
                          stat1=stat1,
                          stat2=stat2,
                          stat_names=stat_names,
                          promedios_gen=promedios_gen,
                          distribucion_tipos=distribucion_tipos,
                          legendarios_gen=legendarios_gen,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/equipo')
 def equipo():
@@ -263,7 +297,8 @@ def equipo():
     
     return render_template('equipo.html',
                          equipo=equipo_pokemon,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/agregar_equipo/<int:pokemon_id>', methods=['POST'])
 def agregar_equipo(pokemon_id):
@@ -345,10 +380,17 @@ def login():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         
+        # Verificar si es el admin
+        if email == ADMIN_EMAIL and password == ADMIN_PASSWORD:
+            session['user'] = email
+            session['is_admin'] = True
+            return redirect(url_for('index'))
+        
         user = users_collection.find_one({'email': email})
         
         if user and check_password_hash(user['password'], password):
             session['user'] = email
+            session['is_admin'] = False
             return redirect(url_for('index'))
         else:
             return render_template('login.html', error='Email o contraseña incorrectos')
@@ -359,7 +401,87 @@ def login():
 def logout():
     """Cerrar sesión"""
     session.pop('user', None)
+    session.pop('is_admin', None)
     return redirect(url_for('index'))
+
+# ==================== RUTAS DE ADMIN ====================
+
+@app.route('/admin/crear_pokemon', methods=['GET', 'POST'])
+def crear_pokemon():
+    """Crear un nuevo Pokémon (solo admin)"""
+    if not is_admin():
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        # Obtener el siguiente ID disponible
+        max_pokemon = pokemon_collection.find_one(sort=[('id', -1)])
+        next_id = (max_pokemon['id'] + 1) if max_pokemon else 1
+        
+        # Crear el documento del Pokémon
+        nuevo_pokemon = {
+            'id': next_id,
+            'name': {
+                'es': request.form.get('nombre_es', '').strip(),
+                'en': request.form.get('nombre_en', '').strip()
+            },
+            'types': [t.strip().lower() for t in request.form.get('tipos', '').split(',') if t.strip()],
+            'stats': {
+                'hp': int(request.form.get('hp', 50)),
+                'attack': int(request.form.get('attack', 50)),
+                'defense': int(request.form.get('defense', 50)),
+                'special_attack': int(request.form.get('special_attack', 50)),
+                'special_defense': int(request.form.get('special_defense', 50)),
+                'speed': int(request.form.get('speed', 50))
+            },
+            'height': int(request.form.get('height', 10)),
+            'weight': int(request.form.get('weight', 100)),
+            'generation': request.form.get('generation', 'generation-i'),
+            'habitat': request.form.get('habitat', 'grassland'),
+            'is_legendary': request.form.get('is_legendary') == 'true',
+            'is_mythical': request.form.get('is_mythical') == 'true',
+            'abilities': [a.strip() for a in request.form.get('abilities', '').split(',') if a.strip()],
+            'capture_rate': int(request.form.get('capture_rate', 45)),
+            'base_experience': int(request.form.get('base_experience', 64)),
+            'flavor_text_es': request.form.get('descripcion', ''),
+            'img': {
+                'front_default': request.form.get('imagen_url', ''),
+                'official_artwork': request.form.get('imagen_url', '')
+            },
+            'es_inventado': True  # Marcar como Pokémon inventado
+        }
+        
+        pokemon_collection.insert_one(nuevo_pokemon)
+        return redirect(url_for('pokemon_detalle', pokemon_id=next_id))
+    
+    # Obtener opciones para los selectores
+    tipos = pokemon_collection.distinct('types')
+    habitats = pokemon_collection.distinct('habitat')
+    generaciones = pokemon_collection.distinct('generation')
+    
+    return render_template('admin_crear_pokemon.html',
+                         tipos=sorted(tipos) if tipos else ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy'],
+                         habitats=sorted([h for h in habitats if h]) if habitats else ['grassland', 'forest', 'cave', 'mountain', 'water', 'sea', 'urban', 'rare'],
+                         generaciones=sorted(generaciones) if generaciones else ['generation-i', 'generation-ii', 'generation-iii', 'generation-iv', 'generation-v', 'generation-vi', 'generation-vii', 'generation-viii', 'generation-ix'],
+                         user=session.get('user'),
+                         is_admin=is_admin())
+
+@app.route('/admin/eliminar_pokemon/<int:pokemon_id>', methods=['POST'])
+def eliminar_pokemon(pokemon_id):
+    """Eliminar un Pokémon (solo admin)"""
+    if not is_admin():
+        return jsonify({'error': 'No autorizado'}), 403
+    
+    result = pokemon_collection.delete_one({'id': pokemon_id})
+    
+    if result.deleted_count > 0:
+        # También eliminar de todos los equipos de usuarios
+        users_collection.update_many(
+            {},
+            {'$pull': {'team': pokemon_id}}
+        )
+        return redirect(url_for('buscar'))
+    
+    return "Pokémon no encontrado", 404
 
 # ==================== API ENDPOINTS (OPCIONAL) ====================
 
@@ -376,8 +498,11 @@ def api_buscar():
     """API: Buscar Pokémon"""
     nombre = request.args.get('nombre', '')
     resultados = list(pokemon_collection.find(
-        {'name.es': {'$regex': nombre, '$options': 'i'}},
-        {'_id': 0, 'id': 1, 'name': 1, 'img': 1}
+        {'$or': [
+            {'name.es': {'$regex': nombre, '$options': 'i'}},
+            {'name.en': {'$regex': nombre, '$options': 'i'}}
+        ]},
+        {'_id': 0, 'id': 1, 'name': 1, 'img': 1, 'types': 1}
     ).limit(10))
     return jsonify(resultados)
 

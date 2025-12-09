@@ -20,6 +20,9 @@
                 <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
                 {% if user %}
                     <li><a href="{{ url_for('equipo') }}">Mi Equipo</a></li>
+                    {% if is_admin %}
+                    <li><a href="{{ url_for('crear_pokemon') }}" class="btn-admin">➕ Crear Pokémon</a></li>
+                    {% endif %}
                     <li><a href="{{ url_for('logout') }}" class="btn-logout">Salir</a></li>
                 {% else %}
                     <li><a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a></li>

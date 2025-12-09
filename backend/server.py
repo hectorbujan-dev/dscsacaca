@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.wsgi import WSGIMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -9,6 +10,9 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List
 import uuid
 from datetime import datetime, timezone
+
+# Import Flask app
+from app import app as flask_app
 
 
 ROOT_DIR = Path(__file__).parent
@@ -83,6 +87,9 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Mount Flask app - this will handle all non-API routes
+app.mount("/", WSGIMiddleware(flask_app))
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

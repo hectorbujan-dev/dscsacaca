@@ -1129,3 +1129,128 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* ==================== ADMIN STYLES ==================== */
+.btn-admin {
+    background-color: #28a745 !important;
+}
+
+.btn-admin:hover {
+    background-color: #218838 !important;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+.delete-form {
+    margin-top: 10px;
+}
+
+.badge-inventado {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 7px;
+    background-color: #17a2b8;
+    color: white;
+}
+
+/* ==================== COMBINED STATS TABLE ==================== */
+.combined-stats-table {
+    overflow-x: auto;
+}
+
+.combined-stats-table .stats-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.combined-stats-table .stats-table th,
+.combined-stats-table .stats-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.combined-stats-table .stats-table th {
+    background-color: #2A75BB;
+    color: white;
+    font-size: 8px;
+}
+
+.table-pokemon-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.table-pokemon-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.rank-badge-small {
+    display: inline-block;
+    background-color: #FFD700;
+    color: #1a1a1a;
+    padding: 5px 10px;
+    border-radius: 50%;
+    font-size: 8px;
+    font-weight: bold;
+}
+
+.stat-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.stat-primary {
+    background-color: #E3350D;
+    color: white;
+}
+
+.stat-secondary {
+    background-color: #2A75BB;
+    color: white;
+}
+
+.stat-total {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Create Pokemon Form */
+.create-pokemon-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.create-pokemon-form input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+

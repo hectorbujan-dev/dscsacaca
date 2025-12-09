@@ -98,6 +98,51 @@
         </div>
     </div>
 
+    <!-- TOP 10 COMBINADO - Mejores en ambas estadísticas -->
+    <div class="stats-section">
+        <h2 class="section-title">🏅 Top 10 Combinado - {{ stat_names[stat1] }} + {{ stat_names[stat2] }}</h2>
+        <p style="text-align: center; margin-bottom: 20px; font-size: 9px; color: #6c757d;">Los mejores Pokémon considerando ambas estadísticas a la vez</p>
+        
+        <div class="combined-stats-table">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Pokémon</th>
+                        <th>{{ stat_names[stat1] }}</th>
+                        <th>{{ stat_names[stat2] }}</th>
+                        <th>Total</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pokemon in top_combinado %}
+                    <tr>
+                        <td><span class="rank-badge-small">{{ loop.index }}</span></td>
+                        <td>
+                            <div class="table-pokemon-info">
+                                <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" alt="{{ pokemon.name.en }}" class="table-pokemon-img">
+                                <div>
+                                    <strong>{{ pokemon.name.en|capitalize if pokemon.name.en and pokemon.name.en != 'none' else pokemon.name.es }}</strong>
+                                    <div class="pokemon-types" style="margin-top: 5px;">
+                                        {% for tipo in pokemon.types %}
+                                        <span class="type-badge type-{{ tipo }}" style="font-size: 6px; padding: 2px 6px;">{{ tipo }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="stat-badge stat-primary">{{ pokemon.stat1_value }}</span></td>
+                        <td><span class="stat-badge stat-secondary">{{ pokemon.stat2_value }}</span></td>
+                        <td><span class="stat-badge stat-total">{{ pokemon.combined_score }}</span></td>
+                        <td><a href="{{ url_for('pokemon_detalle', pokemon_id=pokemon.id) }}" class="btn-secondary btn-small">Ver</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- Promedios por Generación -->
     <div class="stats-section">
         <h2 class="section-title">📈 Promedios de Estadísticas por Generación</h2>
