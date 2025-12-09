@@ -4,41 +4,134 @@
 
 {% block extra_css %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    .search-container {
+        position: relative;
+        width: 100%;
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px;
+        border: 3px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 10px;
+        font-family: 'Press Start 2P', cursive;
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: #2A75BB;
+    }
+    .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 3px solid #2A75BB;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+    }
+    .autocomplete-item {
+        padding: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 9px;
+    }
+    .autocomplete-item:hover {
+        background-color: #f8f9fa;
+    }
+    .autocomplete-item img {
+        width: 40px;
+        height: 40px;
+    }
+    .autocomplete-item .pokemon-info {
+        flex: 1;
+    }
+    .autocomplete-item .pokemon-name {
+        font-weight: bold;
+        color: #E3350D;
+    }
+    .autocomplete-item .pokemon-types {
+        margin-top: 4px;
+    }
+    .selected-pokemon {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    .selected-pokemon img {
+        width: 50px;
+        height: 50px;
+    }
+    .clear-selection {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 8px;
+        font-family: 'Press Start 2P', cursive;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="page-header">
         <h1 class="page-title">⚔️ Comparador de Pokémon</h1>
-        <p>Selecciona dos Pokémon para comparar sus estadísticas</p>
+        <p>Busca dos Pokémon por nombre para comparar sus estadísticas</p>
     </div>
 
-    <form action="{{ url_for('comparar') }}" method="GET" class="compare-form">
+    <form action="{{ url_for('comparar') }}" method="GET" class="compare-form" id="compareForm">
         <div class="compare-selectors">
             <div class="selector-group">
-                <label for="id1">Pokémon 1:</label>
-                <select name="id1" id="id1" class="form-select" required>
-                    <option value="">Selecciona un Pokémon</option>
-                    {% for poke in todos_pokemon %}
-                    <option value="{{ poke.id }}" {% if pokemon1 and poke.id == pokemon1.id %}selected{% endif %}>
-                        #{{ '%03d'|format(poke.id) }} - {{ poke.name.en|capitalize if poke.name.en and poke.name.en != 'none' else poke.name.es }}
-                    </option>
-                    {% endfor %}
-                </select>
+                <label for="search1">Pokémon 1:</label>
+                <div class="search-container">
+                    <input type="text" id="search1" class="search-input" placeholder="Escribe un nombre..." autocomplete="off">
+                    <input type="hidden" name="id1" id="id1" value="{{ pokemon1.id if pokemon1 else '' }}">
+                    <div class="autocomplete-list" id="autocomplete1"></div>
+                </div>
+                {% if pokemon1 %}
+                <div class="selected-pokemon" id="selected1">
+                    <img src="{{ pokemon1.img.official_artwork or pokemon1.img.front_default }}" alt="{{ pokemon1.name.es }}">
+                    <span>{{ pokemon1.name.en|capitalize if pokemon1.name.en and pokemon1.name.en != 'none' else pokemon1.name.es }}</span>
+                    <button type="button" class="clear-selection" onclick="clearSelection(1)">✕</button>
+                </div>
+                {% else %}
+                <div class="selected-pokemon" id="selected1" style="display: none;"></div>
+                {% endif %}
             </div>
             
             <div class="vs-icon">VS</div>
             
             <div class="selector-group">
-                <label for="id2">Pokémon 2:</label>
-                <select name="id2" id="id2" class="form-select" required>
-                    <option value="">Selecciona un Pokémon</option>
-                    {% for poke in todos_pokemon %}
-                    <option value="{{ poke.id }}" {% if pokemon2 and poke.id == pokemon2.id %}selected{% endif %}>
-                        #{{ '%03d'|format(poke.id) }} - {{ poke.name.en|capitalize if poke.name.en and poke.name.en != 'none' else poke.name.es }}
-                    </option>
-                    {% endfor %}
-                </select>
+                <label for="search2">Pokémon 2:</label>
+                <div class="search-container">
+                    <input type="text" id="search2" class="search-input" placeholder="Escribe un nombre..." autocomplete="off">
+                    <input type="hidden" name="id2" id="id2" value="{{ pokemon2.id if pokemon2 else '' }}">
+                    <div class="autocomplete-list" id="autocomplete2"></div>
+                </div>
+                {% if pokemon2 %}
+                <div class="selected-pokemon" id="selected2">
+                    <img src="{{ pokemon2.img.official_artwork or pokemon2.img.front_default }}" alt="{{ pokemon2.name.es }}">
+                    <span>{{ pokemon2.name.en|capitalize if pokemon2.name.en and pokemon2.name.en != 'none' else pokemon2.name.es }}</span>
+                    <button type="button" class="clear-selection" onclick="clearSelection(2)">✕</button>
+                </div>
+                {% else %}
+                <div class="selected-pokemon" id="selected2" style="display: none;"></div>
+                {% endif %}
             </div>
         </div>
         
@@ -184,4 +277,92 @@
     </script>
     {% endif %}
 </div>
+
+<script>
+// Autocomplete functionality
+let debounceTimer;
+
+function setupAutocomplete(inputId, listId, hiddenId, selectedId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    const hidden = document.getElementById(hiddenId);
+    const selected = document.getElementById(selectedId);
+    
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            list.style.display = 'none';
+            return;
+        }
+        
+        debounceTimer = setTimeout(() => {
+            fetch(`/api/buscar?nombre=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    list.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(pokemon => {
+                            const item = document.createElement('div');
+                            item.className = 'autocomplete-item';
+                            const imgUrl = pokemon.img ? (pokemon.img.official_artwork || pokemon.img.front_default || '') : '';
+                            const nameEn = pokemon.name.en && pokemon.name.en !== 'none' ? pokemon.name.en.charAt(0).toUpperCase() + pokemon.name.en.slice(1) : '';
+                            const nameEs = pokemon.name.es && pokemon.name.es !== 'none' ? pokemon.name.es : '';
+                            const displayName = nameEn || nameEs || 'Sin nombre';
+                            
+                            let typesHtml = '';
+                            if (pokemon.types && pokemon.types.length > 0) {
+                                typesHtml = pokemon.types.map(t => `<span class="type-badge type-${t}" style="font-size:6px;padding:2px 6px;">${t}</span>`).join(' ');
+                            }
+                            
+                            item.innerHTML = `
+                                <img src="${imgUrl}" alt="${displayName}" onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'">
+                                <div class="pokemon-info">
+                                    <div class="pokemon-name">#${String(pokemon.id).padStart(3, '0')} - ${displayName}</div>
+                                    <div class="pokemon-types">${typesHtml}</div>
+                                </div>
+                            `;
+                            
+                            item.addEventListener('click', () => {
+                                hidden.value = pokemon.id;
+                                input.value = '';
+                                list.style.display = 'none';
+                                
+                                selected.innerHTML = `
+                                    <img src="${imgUrl}" alt="${displayName}">
+                                    <span>${displayName}</span>
+                                    <button type="button" class="clear-selection" onclick="clearSelection(${hiddenId.replace('id', '')})">✕</button>
+                                `;
+                                selected.style.display = 'flex';
+                            });
+                            
+                            list.appendChild(item);
+                        });
+                        list.style.display = 'block';
+                    } else {
+                        list.style.display = 'none';
+                    }
+                });
+        }, 300);
+    });
+    
+    // Hide list when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !list.contains(e.target)) {
+            list.style.display = 'none';
+        }
+    });
+}
+
+function clearSelection(num) {
+    document.getElementById('id' + num).value = '';
+    document.getElementById('selected' + num).style.display = 'none';
+    document.getElementById('search' + num).value = '';
+}
+
+// Initialize autocomplete for both search boxes
+setupAutocomplete('search1', 'autocomplete1', 'id1', 'selected1');
+setupAutocomplete('search2', 'autocomplete2', 'id2', 'selected2');
+</script>
 {% endblock %}
