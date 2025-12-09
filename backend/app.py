@@ -159,16 +159,43 @@ def comparar():
 def estadisticas():
     """Página de estadísticas con agregaciones"""
     
-    # Agregación 1: Top 10 Pokémon con mayor ataque
-    top_ataque = list(pokemon_collection.aggregate([
-        {'$sort': {'stats.attack': -1}},
+    # Obtener parámetros de filtro
+    stat1 = request.args.get('stat1', 'attack')
+    stat2 = request.args.get('stat2', 'speed')
+    
+    # Mapeo de nombres de stats
+    stat_names = {
+        'hp': 'HP',
+        'attack': 'Ataque',
+        'defense': 'Defensa',
+        'special_attack': 'Ataque Especial',
+        'special_defense': 'Defensa Especial',
+        'speed': 'Velocidad'
+    }
+    
+    # Agregación 1: Top 10 Pokémon con mayor stat seleccionada
+    top_stat1 = list(pokemon_collection.aggregate([
+        {'$sort': {f'stats.{stat1}': -1}},
         {'$limit': 10},
         {'$project': {
             'id': 1,
             'name': 1,
             'types': 1,
             'img': 1,
-            'attack': '$stats.attack'
+            'stat_value': f'$stats.{stat1}'
+        }}
+    ]))
+    
+    # Agregación 2: Top 10 con segunda stat
+    top_stat2 = list(pokemon_collection.aggregate([
+        {'$sort': {f'stats.{stat2}': -1}},
+        {'$limit': 10},
+        {'$project': {
+            'id': 1,
+            'name': 1,
+            'types': 1,
+            'img': 1,
+            'stat_value': f'$stats.{stat2}'
         }}
     ]))
     
