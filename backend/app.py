@@ -353,10 +353,17 @@ def login():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         
+        # Verificar si es el admin
+        if email == ADMIN_EMAIL and password == ADMIN_PASSWORD:
+            session['user'] = email
+            session['is_admin'] = True
+            return redirect(url_for('index'))
+        
         user = users_collection.find_one({'email': email})
         
         if user and check_password_hash(user['password'], password):
             session['user'] = email
+            session['is_admin'] = False
             return redirect(url_for('index'))
         else:
             return render_template('login.html', error='Email o contraseña incorrectos')
