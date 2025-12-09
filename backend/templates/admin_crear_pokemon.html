@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Pokémon - Admin - Pokédex UAX{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">🎨 Crear Pokémon Inventado</h1>
+        <p>Panel de Administrador - Crea tu propio Pokémon</p>
+    </div>
+
+    <div class="search-box">
+        <form action="{{ url_for('crear_pokemon') }}" method="POST" class="create-pokemon-form">
+            <h2 class="section-title">📝 Información Básica</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nombre_es">Nombre (Español) *</label>
+                    <input type="text" id="nombre_es" name="nombre_es" class="form-input" required placeholder="Ej: Pikachu">
+                </div>
+                
+                <div class="form-group">
+                    <label for="nombre_en">Nombre (Inglés)</label>
+                    <input type="text" id="nombre_en" name="nombre_en" class="form-input" placeholder="Ej: Pikachu">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipos">Tipos (separados por coma) *</label>
+                    <input type="text" id="tipos" name="tipos" class="form-input" required placeholder="Ej: electric, fairy">
+                </div>
+                
+                <div class="form-group">
+                    <label for="generation">Generación</label>
+                    <select id="generation" name="generation" class="form-select">
+                        {% for gen in generaciones %}
+                        <option value="{{ gen }}">{{ gen|replace('generation-', 'Gen ')|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="habitat">Hábitat</label>
+                    <select id="habitat" name="habitat" class="form-select">
+                        {% for hab in habitats %}
+                        <option value="{{ hab }}">{{ hab|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagen_url">URL de Imagen</label>
+                    <input type="url" id="imagen_url" name="imagen_url" class="form-input" placeholder="https://ejemplo.com/imagen.png">
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">📊 Estadísticas Base (0-255)</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="hp">HP</label>
+                    <input type="number" id="hp" name="hp" class="form-input" min="1" max="255" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="attack">Ataque</label>
+                    <input type="number" id="attack" name="attack" class="form-input" min="1" max="255" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="defense">Defensa</label>
+                    <input type="number" id="defense" name="defense" class="form-input" min="1" max="255" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="special_attack">Ataque Especial</label>
+                    <input type="number" id="special_attack" name="special_attack" class="form-input" min="1" max="255" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="special_defense">Defensa Especial</label>
+                    <input type="number" id="special_defense" name="special_defense" class="form-input" min="1" max="255" value="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="speed">Velocidad</label>
+                    <input type="number" id="speed" name="speed" class="form-input" min="1" max="255" value="50">
+                </div>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">📋 Detalles Adicionales</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="height">Altura (decímetros)</label>
+                    <input type="number" id="height" name="height" class="form-input" min="1" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Peso (hectogramos)</label>
+                    <input type="number" id="weight" name="weight" class="form-input" min="1" value="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="capture_rate">Ratio de Captura (0-255)</label>
+                    <input type="number" id="capture_rate" name="capture_rate" class="form-input" min="1" max="255" value="45">
+                </div>
+                
+                <div class="form-group">
+                    <label for="base_experience">Experiencia Base</label>
+                    <input type="number" id="base_experience" name="base_experience" class="form-input" min="1" value="64">
+                </div>
+                
+                <div class="form-group">
+                    <label for="abilities">Habilidades (separadas por coma)</label>
+                    <input type="text" id="abilities" name="abilities" class="form-input" placeholder="Ej: static, lightning-rod">
+                </div>
+            </div>
+
+            <div class="form-grid" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_legendary" value="true"> Es Legendario
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_mythical" value="true"> Es Mítico
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" class="form-input" rows="3" placeholder="Una breve descripción de tu Pokémon..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary btn-large" style="margin-top: 20px;">✨ Crear Pokémon</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
