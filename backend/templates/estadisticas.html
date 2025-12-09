@@ -132,30 +132,6 @@
         </div>
     </div>
 
-    <!-- Top 10 Mayor Velocidad -->
-    <div class="stats-section">
-        <h2 class="section-title">⚡ Top 10 Pokémon Más Rápidos</h2>
-        <div class="speed-list">
-            {% for pokemon in top_velocidad %}
-            <div class="speed-item">
-                <span class="speed-rank">{{ loop.index }}</span>
-                <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
-                     alt="{{ pokemon.name.es }}"
-                     class="speed-img">
-                <div class="speed-info">
-                    <h3>{{ pokemon.name.es }}</h3>
-                    <div class="pokemon-types">
-                        {% for tipo in pokemon.types %}
-                        <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="speed-value">{{ pokemon.speed }}</div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
     <!-- Distribución por Tipos -->
     <div class="stats-section">
         <h2 class="section-title">🎨 Distribución de Pokémon por Tipo</h2>
