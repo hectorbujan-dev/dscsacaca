@@ -118,7 +118,8 @@ def buscar():
     return render_template('resultados.html', 
                          pokemons=resultados,
                          total=len(resultados),
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/pokemon/<int:pokemon_id>')
 def pokemon_detalle(pokemon_id):
