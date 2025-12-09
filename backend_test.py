@@ -152,7 +152,7 @@ class PokédexTester:
         """Test statistics page with combined stats"""
         print("\n📊 Testing Statistics with Combined Stats...")
         
-        stats_url = urljoin(self.base_url, '/estadisticas')
+        stats_url = urljoin(self.flask_url, '/estadisticas')
         
         try:
             params = {'stat1': 'attack', 'stat2': 'speed'}
