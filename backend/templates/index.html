@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Pokédex UAX{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">🔴 BIENVENIDO A LA POKÉDEX</h1>
+            <p class="hero-subtitle">Explora, busca y compara todos los Pokémon</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="search-box">
+        <h2 class="section-title">🔍 Buscar Pokémon</h2>
+        
+        <form action="{{ url_for('buscar') }}" method="GET" class="search-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Pikachu" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo">Tipo:</label>
+                    <select id="tipo" name="tipo" class="form-select">
+                        <option value="">Todos los tipos</option>
+                        {% for tipo in tipos %}
+                            <option value="{{ tipo }}">{{ tipo|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="habitat">Hábitat:</label>
+                    <select id="habitat" name="habitat" class="form-select">
+                        <option value="">Todos los hábitats</option>
+                        {% for habitat in habitats %}
+                            <option value="{{ habitat }}">{{ habitat|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="generacion">Generación:</label>
+                    <select id="generacion" name="generacion" class="form-select">
+                        <option value="">Todas las generaciones</option>
+                        {% for gen in generaciones %}
+                            <option value="{{ gen }}">{{ gen|replace('generation-', 'Gen ')|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="legendario">Legendario:</label>
+                    <select id="legendario" name="legendario" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="true">Sí</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mitico">Mítico:</label>
+                    <select id="mitico" name="mitico" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="true">Sí</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary btn-large">🔍 Buscar Pokémon</button>
+        </form>
+    </div>
+
+    <div class="info-cards">
+        <div class="info-card">
+            <div class="info-icon">📊</div>
+            <h3>Estadísticas</h3>
+            <p>Descubre los Pokémon más fuertes y rápidos</p>
+            <a href="{{ url_for('estadisticas') }}" class="btn-secondary">Ver estadísticas</a>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">⚔️</div>
+            <h3>Comparador</h3>
+            <p>Compara dos Pokémon lado a lado</p>
+            <a href="{{ url_for('comparar') }}" class="btn-secondary">Comparar</a>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">🎯</div>
+            <h3>Mi Equipo</h3>
+            <p>Crea tu equipo ideal de 6 Pokémon</p>
+            {% if user %}
+                <a href="{{ url_for('equipo') }}" class="btn-secondary">Ver mi equipo</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-secondary">Iniciar sesión</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

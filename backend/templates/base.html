@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pokédex UAX{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🔴 POKÉDEX UAX</h1>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                <li><a href="{{ url_for('comparar') }}">Comparar</a></li>
+                <li><a href="{{ url_for('estadisticas') }}">Estadísticas</a></li>
+                {% if user %}
+                    <li><a href="{{ url_for('equipo') }}">Mi Equipo</a></li>
+                    <li><a href="{{ url_for('logout') }}" class="btn-logout">Salir</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}" class="btn-login">Iniciar Sesión</a></li>
+                    <li><a href="{{ url_for('registro') }}" class="btn-register">Registrarse</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 Pokédex UAX - Universidad Alfonso X El Sabio</p>
+            <p>Modelado Avanzado de la Información</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
