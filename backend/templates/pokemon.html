@@ -19,8 +19,8 @@
             
             <div class="detail-info">
                 <div class="pokemon-number">#{{ '%03d'|format(pokemon.id) }}</div>
-                <h1 class="detail-title">{{ pokemon.name.es }}</h1>
-                <p class="detail-subtitle">{{ pokemon.name.en|capitalize }}</p>
+                <h1 class="detail-title">{{ pokemon.name.en|capitalize if pokemon.name.en and pokemon.name.en != 'none' else ' ' }}</h1>
+                <p class="detail-subtitle">{{ pokemon.name.es if pokemon.name.es and pokemon.name.es != 'none' else ' ' }}</p>
                 
                 <div class="pokemon-types">
                     {% for tipo in pokemon.types %}
