@@ -164,7 +164,8 @@ def comparar():
                          pokemon1=pokemon1,
                          pokemon2=pokemon2,
                          todos_pokemon=todos_pokemon,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/estadisticas')
 def estadisticas():
