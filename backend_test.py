@@ -26,8 +26,9 @@ print(f"🔍 Testing Pokédex Backend at: {BACKEND_URL}")
 print("=" * 60)
 
 class PokédexTester:
-    def __init__(self, base_url):
+    def __init__(self, base_url, flask_url=None):
         self.base_url = base_url
+        self.flask_url = flask_url or base_url
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Pokédex-Tester/1.0'
