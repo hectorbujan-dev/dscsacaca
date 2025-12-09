@@ -27,6 +27,14 @@ db = client[DB_NAME]
 pokemon_collection = db[COLLECTION_NAME]
 users_collection = db['users']
 
+# Credenciales de administrador
+ADMIN_EMAIL = 'hectorbujan@gmail.com'
+ADMIN_PASSWORD = 'hector2005'
+
+def is_admin():
+    """Verificar si el usuario actual es admin"""
+    return session.get('user') == ADMIN_EMAIL and session.get('is_admin') == True
+
 # Crear índices para optimizar búsquedas
 try:
     pokemon_collection.create_index('id', unique=True)
