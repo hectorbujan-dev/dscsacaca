@@ -858,6 +858,38 @@ body {
     border: 3px solid var(--color-amarillo);
 }
 
+.stats-filter-form {
+    background-color: var(--color-fondo);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 20px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 8px;
+    color: var(--color-negro);
+}
+
+.pokemon-subtitle-small {
+    text-align: center;
+    font-size: 7px;
+    color: var(--color-gris);
+    margin: 5px 0 10px 0;
+    font-family: Arial, sans-serif;
+}
+
 .top-pokemon-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
