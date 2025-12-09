@@ -493,8 +493,11 @@ def api_buscar():
     """API: Buscar Pokémon"""
     nombre = request.args.get('nombre', '')
     resultados = list(pokemon_collection.find(
-        {'name.es': {'$regex': nombre, '$options': 'i'}},
-        {'_id': 0, 'id': 1, 'name': 1, 'img': 1}
+        {'$or': [
+            {'name.es': {'$regex': nombre, '$options': 'i'}},
+            {'name.en': {'$regex': nombre, '$options': 'i'}}
+        ]},
+        {'_id': 0, 'id': 1, 'name': 1, 'img': 1, 'types': 1}
     ).limit(10))
     return jsonify(resultados)
 
