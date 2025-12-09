@@ -53,7 +53,8 @@
                     <img src="{{ pokemon1.img.official_artwork or pokemon1.img.front_default }}" 
                          alt="{{ pokemon1.name.es }}">
                 </div>
-                <h2 class="pokemon-name">{{ pokemon1.name.es }}</h2>
+                <h2 class="pokemon-name">{{ pokemon1.name.en|capitalize if pokemon1.name.en and pokemon1.name.en != 'none' else ' ' }}</h2>
+                <p class="pokemon-subtitle">{{ pokemon1.name.es if pokemon1.name.es and pokemon1.name.es != 'none' else ' ' }}</p>
                 <div class="pokemon-id">#{{ '%03d'|format(pokemon1.id) }}</div>
                 <div class="pokemon-types">
                     {% for tipo in pokemon1.types %}
