@@ -363,7 +363,7 @@ class PokédexTester:
 
 def main():
     """Main test execution"""
-    tester = PokédexTester(BACKEND_URL)
+    tester = PokédexTester(BACKEND_URL, FLASK_BACKEND_URL)
     success = tester.run_all_tests()
     
     if success:
