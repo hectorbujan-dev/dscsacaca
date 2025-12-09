@@ -202,7 +202,7 @@ class PokédexTester:
             print("❌ Cannot test create Pokemon - Admin login failed")
             return False
         
-        create_url = urljoin(self.base_url, '/admin/crear_pokemon')
+        create_url = urljoin(self.flask_url, '/admin/crear_pokemon')
         
         try:
             # First test GET request to load the form
