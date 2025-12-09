@@ -88,6 +88,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Mount Flask app - this will handle all non-API routes
+app.mount("/", WSGIMiddleware(flask_app))
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
