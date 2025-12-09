@@ -101,3 +101,163 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Implementar tres mejoras en la Pokédex UAX:
+  1. Sistema de Admin para eliminar y crear Pokémon inventados (solo con credenciales hectorbujan@gmail.com / hector2005)
+  2. Búsqueda por nombre en el comparador de Pokémon (en lugar de selectores dropdown)
+  3. Filtrar Top 10 por dos estadísticas a la vez en la página de estadísticas
+
+backend:
+  - task: "Admin login con credenciales específicas"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/app.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implementado login especial para admin (hectorbujan@gmail.com / hector2005)"
+
+  - task: "Crear Pokémon inventados (solo admin)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/app.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ruta /admin/crear_pokemon para crear Pokémon personalizados"
+
+  - task: "Eliminar Pokémon (solo admin)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/app.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ruta /admin/eliminar_pokemon/<id> para eliminar cualquier Pokémon"
+
+  - task: "API de búsqueda de Pokémon por nombre"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/app.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint /api/buscar mejorado para buscar por nombre en español e inglés"
+
+  - task: "Top 10 combinado de dos estadísticas"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/app.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Nueva agregación que suma ambas estadísticas y muestra Top 10 combinado"
+
+frontend:
+  - task: "Botón Crear Pokémon en navbar (solo admin)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/templates/base.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Enlace visible solo para admin en la navegación"
+
+  - task: "Formulario de creación de Pokémon"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/templates/admin_crear_pokemon.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Template completo con formulario para crear Pokémon inventados"
+
+  - task: "Botón eliminar en resultados y detalle (solo admin)"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/templates/resultados.html, /app/backend/templates/pokemon.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Botón eliminar visible solo para admin con confirmación"
+
+  - task: "Búsqueda por nombre en comparador"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/templates/comparar.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campos de texto con autocompletado en lugar de selectores"
+
+  - task: "Tabla Top 10 combinado en estadísticas"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/templates/estadisticas.html"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Nueva sección con tabla mostrando Pokémon con mejores valores en ambas stats"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Admin login con credenciales específicas"
+    - "Crear Pokémon inventados"
+    - "Eliminar Pokémon"
+    - "Búsqueda por nombre en comparador"
+    - "Top 10 combinado de estadísticas"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      He implementado las tres funcionalidades solicitadas:
+      1. Sistema de Admin: Login con hectorbujan@gmail.com / hector2005, crear y eliminar Pokémon
+      2. Comparador: Búsqueda por nombre con autocompletado
+      3. Estadísticas: Top 10 combinado sumando dos estadísticas seleccionadas
+      
+      Por favor, testear los endpoints del backend principalmente:
+      - POST /login con admin credentials
+      - GET/POST /admin/crear_pokemon (necesita sesión admin)
+      - POST /admin/eliminar_pokemon/<id> (necesita sesión admin)
+      - GET /api/buscar?nombre=<nombre>
+      - GET /estadisticas?stat1=attack&stat2=speed (verificar top_combinado)
