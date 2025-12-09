@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Estadísticas - Pokédex UAX{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">📊 Estadísticas Pokémon</h1>
+        <p>Análisis de datos con agregaciones de MongoDB</p>
+    </div>
+
+    <!-- Top 10 Mayor Ataque -->
+    <div class="stats-section">
+        <h2 class="section-title">⚔️ Top 10 Pokémon con Mayor Ataque</h2>
+        <div class="top-pokemon-grid">
+            {% for pokemon in top_ataque %}
+            <div class="top-pokemon-card">
+                <div class="rank-badge">#{{ loop.index }}</div>
+                <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
+                     alt="{{ pokemon.name.es }}">
+                <h3>{{ pokemon.name.es }}</h3>
+                <div class="pokemon-types">
+                    {% for tipo in pokemon.types %}
+                    <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
+                    {% endfor %}
+                </div>
+                <div class="stat-highlight">
+                    <span class="stat-label">Ataque</span>
+                    <span class="stat-number">{{ pokemon.attack }}</span>
+                </div>
+                <a href="{{ url_for('pokemon_detalle', pokemon_id=pokemon.id) }}" class="btn-secondary btn-small">Ver detalles</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Promedios por Generación -->
+    <div class="stats-section">
+        <h2 class="section-title">📈 Promedios de Estadísticas por Generación</h2>
+        <div class="chart-container">
+            <canvas id="generationChart"></canvas>
+        </div>
+        <div class="generation-table">
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Generación</th>
+                        <th>Total Pokémon</th>
+                        <th>Prom. HP</th>
+                        <th>Prom. Ataque</th>
+                        <th>Prom. Defensa</th>
+                        <th>Prom. Velocidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for gen in promedios_gen %}
+                    <tr>
+                        <td>{{ gen._id|replace('generation-', 'Gen ')|upper }}</td>
+                        <td>{{ gen.total_pokemon }}</td>
+                        <td>{{ gen.promedio_hp|round(1) }}</td>
+                        <td>{{ gen.promedio_attack|round(1) }}</td>
+                        <td>{{ gen.promedio_defense|round(1) }}</td>
+                        <td>{{ gen.promedio_speed|round(1) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Top 10 Mayor Velocidad -->
+    <div class="stats-section">
+        <h2 class="section-title">⚡ Top 10 Pokémon Más Rápidos</h2>
+        <div class="speed-list">
+            {% for pokemon in top_velocidad %}
+            <div class="speed-item">
+                <span class="speed-rank">{{ loop.index }}</span>
+                <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
+                     alt="{{ pokemon.name.es }}"
+                     class="speed-img">
+                <div class="speed-info">
+                    <h3>{{ pokemon.name.es }}</h3>
+                    <div class="pokemon-types">
+                        {% for tipo in pokemon.types %}
+                        <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="speed-value">{{ pokemon.speed }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Distribución por Tipos -->
+    <div class="stats-section">
+        <h2 class="section-title">🎨 Distribución de Pokémon por Tipo</h2>
+        <div class="chart-container">
+            <canvas id="typesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Legendarios y Míticos por Generación -->
+    <div class="stats-section">
+        <h2 class="section-title">✨ Pokémon Legendarios y Míticos por Generación</h2>
+        <div class="chart-container">
+            <canvas id="legendaryChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// Gráfico de promedios por generación
+const genCtx = document.getElementById('generationChart').getContext('2d');
+new Chart(genCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for gen in promedios_gen %}'{{ gen._id|replace("generation-", "Gen ")|upper }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [
+            {
+                label: 'HP',
+                data: [{% for gen in promedios_gen %}{{ gen.promedio_hp|round(1) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#FF5959'
+            },
+            {
+                label: 'Ataque',
+                data: [{% for gen in promedios_gen %}{{ gen.promedio_attack|round(1) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#F5AC78'
+            },
+            {
+                label: 'Defensa',
+                data: [{% for gen in promedios_gen %}{{ gen.promedio_defense|round(1) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#FAE078'
+            },
+            {
+                label: 'Velocidad',
+                data: [{% for gen in promedios_gen %}{{ gen.promedio_speed|round(1) }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#9DB7F5'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Gráfico de distribución por tipos
+const typesCtx = document.getElementById('typesChart').getContext('2d');
+new Chart(typesCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for tipo in distribucion_tipos %}'{{ tipo._id|capitalize }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for tipo in distribucion_tipos %}{{ tipo.cantidad }}{% if not loop.last %},{% endif %}{% endfor %}],
+            backgroundColor: [
+                '#A8A878', '#EE8130', '#6390F0', '#F7D02C', '#7AC74C',
+                '#96D9D6', '#C22E28', '#A33EA1', '#E2BF65', '#A98FF3',
+                '#FA6555', '#B6A136', '#B7B7CE', '#735797', '#6F35FC',
+                '#705746', '#B09398', '#D685AD'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: {
+                position: 'right'
+            }
+        }
+    }
+});
+
+// Gráfico de legendarios y míticos
+const legendaryCtx = document.getElementById('legendaryChart').getContext('2d');
+new Chart(legendaryCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for gen in legendarios_gen %}'{{ gen._id|replace("generation-", "Gen ")|upper }}'{% if not loop.last %},{% endif %}{% endfor %}],
+        datasets: [
+            {
+                label: 'Legendarios',
+                data: [{% for gen in legendarios_gen %}{{ gen.legendarios }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#FFD700'
+            },
+            {
+                label: 'Míticos',
+                data: [{% for gen in legendarios_gen %}{{ gen.miticos }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: '#E6E6FA'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
