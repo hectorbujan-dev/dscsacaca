@@ -18,6 +18,10 @@ load_dotenv('/app/frontend/.env')
 # Get backend URL from frontend environment
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://pokedex-compare.preview.emergentagent.com')
 
+# For Flask routes, we need to use the internal backend URL since external routing 
+# directs non-API routes to frontend
+FLASK_BACKEND_URL = 'http://localhost:8001'
+
 print(f"🔍 Testing Pokédex Backend at: {BACKEND_URL}")
 print("=" * 60)
 
