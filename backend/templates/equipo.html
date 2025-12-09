@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Mi Equipo - Pokédex UAX{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">🎯 Mi Equipo Pokémon</h1>
+        <p>Puedes tener hasta 6 Pokémon en tu equipo</p>
+    </div>
+
+    {% if equipo %}
+        <div class="team-info">
+            <div class="team-count">Pokémon en equipo: <strong>{{ equipo|length }}/6</strong></div>
+        </div>
+        
+        <div class="team-grid">
+            {% for pokemon in equipo %}
+            <div class="team-card">
+                <div class="pokemon-id">#{{ '%03d'|format(pokemon.id) }}</div>
+                
+                <div class="pokemon-image">
+                    <a href="{{ url_for('pokemon_detalle', pokemon_id=pokemon.id) }}">
+                        <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
+                             alt="{{ pokemon.name.es }}">
+                    </a>
+                </div>
+                
+                <h3 class="pokemon-name">{{ pokemon.name.es }}</h3>
+                
+                <div class="pokemon-types">
+                    {% for tipo in pokemon.types %}
+                    <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
+                    {% endfor %}
+                </div>
+                
+                <div class="team-stats">
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">HP</span>
+                        <span class="mini-stat-value">{{ pokemon.stats.hp }}</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">ATK</span>
+                        <span class="mini-stat-value">{{ pokemon.stats.attack }}</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">DEF</span>
+                        <span class="mini-stat-value">{{ pokemon.stats.defense }}</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-label">SPD</span>
+                        <span class="mini-stat-value">{{ pokemon.stats.speed }}</span>
+                    </div>
+                </div>
+                
+                <form action="{{ url_for('eliminar_equipo', pokemon_id=pokemon.id) }}" method="POST" class="remove-form">
+                    <button type="submit" class="btn-remove" onclick="return confirm('¿Seguro que quieres eliminar a {{ pokemon.name.es }} de tu equipo?')">
+                        ❌ Eliminar del equipo
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if equipo|length < 6 %}
+        <div class="add-more">
+            <p>🔍 <a href="{{ url_for('index') }}">Busca más Pokémon</a> para completar tu equipo</p>
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-team">
+            <div class="empty-icon">🎯</div>
+            <h2>Tu equipo está vacío</h2>
+            <p>Aún no has agregado ningún Pokémon a tu equipo</p>
+            <a href="{{ url_for('index') }}" class="btn-primary btn-large">🔍 Buscar Pokémon</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
