@@ -21,7 +21,7 @@
                     <option value="">Selecciona un Pokémon</option>
                     {% for poke in todos_pokemon %}
                     <option value="{{ poke.id }}" {% if pokemon1 and poke.id == pokemon1.id %}selected{% endif %}>
-                        #{{ '%03d'|format(poke.id) }} - {{ poke.name.es }}
+                        #{{ '%03d'|format(poke.id) }} - {{ poke.name.en|capitalize if poke.name.en and poke.name.en != 'none' else poke.name.es }}
                     </option>
                     {% endfor %}
                 </select>
