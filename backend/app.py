@@ -236,9 +236,12 @@ def estadisticas():
     ]))
     
     return render_template('estadisticas.html',
-                         top_ataque=top_ataque,
+                         top_stat1=top_stat1,
+                         top_stat2=top_stat2,
+                         stat1=stat1,
+                         stat2=stat2,
+                         stat_names=stat_names,
                          promedios_gen=promedios_gen,
-                         top_velocidad=top_velocidad,
                          distribucion_tipos=distribucion_tipos,
                          legendarios_gen=legendarios_gen,
                          user=session.get('user'))
