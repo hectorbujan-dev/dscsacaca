@@ -72,7 +72,7 @@ class PokédexTester:
         """Test admin login with wrong credentials"""
         print("\n🔐 Testing Admin Login with Wrong Credentials...")
         
-        login_url = urljoin(self.base_url, '/login')
+        login_url = urljoin(self.flask_url, '/login')
         
         # Test with wrong credentials
         wrong_data = {
