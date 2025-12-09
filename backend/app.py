@@ -212,20 +212,7 @@ def estadisticas():
         {'$sort': {'_id': 1}}
     ]))
     
-    # Agregación 3: Top 10 Pokémon más rápidos
-    top_velocidad = list(pokemon_collection.aggregate([
-        {'$sort': {'stats.speed': -1}},
-        {'$limit': 10},
-        {'$project': {
-            'id': 1,
-            'name': 1,
-            'types': 1,
-            'img': 1,
-            'speed': '$stats.speed'
-        }}
-    ]))
-    
-    # Agregación 4: Distribución de Pokémon por tipo
+    # Agregación 3: Distribución de Pokémon por tipo
     distribucion_tipos = list(pokemon_collection.aggregate([
         {'$unwind': '$types'},
         {'$group': {
