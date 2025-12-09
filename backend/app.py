@@ -139,7 +139,8 @@ def pokemon_detalle(pokemon_id):
     return render_template('pokemon.html', 
                          pokemon=pokemon,
                          en_equipo=en_equipo,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/comparar')
 def comparar():
