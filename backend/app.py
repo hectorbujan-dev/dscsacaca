@@ -297,7 +297,8 @@ def equipo():
     
     return render_template('equipo.html',
                          equipo=equipo_pokemon,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/agregar_equipo/<int:pokemon_id>', methods=['POST'])
 def agregar_equipo(pokemon_id):
