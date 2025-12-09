@@ -222,7 +222,7 @@ def estadisticas():
         {'$sort': {'cantidad': -1}}
     ]))
     
-    # Agregación 5: Pokémon legendarios y míticos por generación
+    # Agregación 4: Pokémon legendarios y míticos por generación
     legendarios_gen = list(pokemon_collection.aggregate([
         {'$match': {
             '$or': [{'is_legendary': True}, {'is_mythical': True}]
