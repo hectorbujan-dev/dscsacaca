@@ -38,7 +38,7 @@ class PokédexTester:
         """Test admin authentication with specific credentials"""
         print("\n🔐 Testing Admin Login...")
         
-        login_url = urljoin(self.base_url, '/login')
+        login_url = urljoin(self.flask_url, '/login')
         
         # Test with correct admin credentials
         login_data = {
