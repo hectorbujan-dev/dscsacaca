@@ -292,7 +292,7 @@ class PokédexTester:
             print("⚠️ No Pokemon available for deletion test - skipping")
             return True  # Not a failure, just no test subject
         
-        delete_url = urljoin(self.base_url, f'/admin/eliminar_pokemon/{pokemon_id}')
+        delete_url = urljoin(self.flask_url, f'/admin/eliminar_pokemon/{pokemon_id}')
         
         try:
             response = self.session.post(delete_url, allow_redirects=False)
