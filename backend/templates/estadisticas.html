@@ -13,24 +13,84 @@
         <p>Análisis de datos con agregaciones de MongoDB</p>
     </div>
 
-    <!-- Top 10 Mayor Ataque -->
+    <!-- Selectores de Estadísticas -->
     <div class="stats-section">
-        <h2 class="section-title">⚔️ Top 10 Pokémon con Mayor Ataque</h2>
+        <form action="{{ url_for('estadisticas') }}" method="GET" class="stats-filter-form">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="stat1">Primera Estadística:</label>
+                    <select name="stat1" id="stat1" class="form-select">
+                        <option value="hp" {% if stat1 == 'hp' %}selected{% endif %}>HP</option>
+                        <option value="attack" {% if stat1 == 'attack' %}selected{% endif %}>Ataque</option>
+                        <option value="defense" {% if stat1 == 'defense' %}selected{% endif %}>Defensa</option>
+                        <option value="special_attack" {% if stat1 == 'special_attack' %}selected{% endif %}>Ataque Especial</option>
+                        <option value="special_defense" {% if stat1 == 'special_defense' %}selected{% endif %}>Defensa Especial</option>
+                        <option value="speed" {% if stat1 == 'speed' %}selected{% endif %}>Velocidad</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="stat2">Segunda Estadística:</label>
+                    <select name="stat2" id="stat2" class="form-select">
+                        <option value="hp" {% if stat2 == 'hp' %}selected{% endif %}>HP</option>
+                        <option value="attack" {% if stat2 == 'attack' %}selected{% endif %}>Ataque</option>
+                        <option value="defense" {% if stat2 == 'defense' %}selected{% endif %}>Defensa</option>
+                        <option value="special_attack" {% if stat2 == 'special_attack' %}selected{% endif %}>Ataque Especial</option>
+                        <option value="special_defense" {% if stat2 == 'special_defense' %}selected{% endif %}>Defensa Especial</option>
+                        <option value="speed" {% if stat2 == 'speed' %}selected{% endif %}>Velocidad</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-primary">🔄 Actualizar</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Top 10 Primera Estadística -->
+    <div class="stats-section">
+        <h2 class="section-title">🏆 Top 10 - {{ stat_names[stat1] }}</h2>
         <div class="top-pokemon-grid">
-            {% for pokemon in top_ataque %}
+            {% for pokemon in top_stat1 %}
             <div class="top-pokemon-card">
                 <div class="rank-badge">#{{ loop.index }}</div>
                 <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
-                     alt="{{ pokemon.name.es }}">
-                <h3>{{ pokemon.name.es }}</h3>
+                     alt="{{ pokemon.name.en }}">
+                <h3>{{ pokemon.name.en|capitalize if pokemon.name.en and pokemon.name.en != 'none' else ' ' }}</h3>
+                <p class="pokemon-subtitle-small">{{ pokemon.name.es if pokemon.name.es and pokemon.name.es != 'none' else ' ' }}</p>
                 <div class="pokemon-types">
                     {% for tipo in pokemon.types %}
                     <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
                     {% endfor %}
                 </div>
                 <div class="stat-highlight">
-                    <span class="stat-label">Ataque</span>
-                    <span class="stat-number">{{ pokemon.attack }}</span>
+                    <span class="stat-label">{{ stat_names[stat1] }}</span>
+                    <span class="stat-number">{{ pokemon.stat_value }}</span>
+                </div>
+                <a href="{{ url_for('pokemon_detalle', pokemon_id=pokemon.id) }}" class="btn-secondary btn-small">Ver detalles</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Top 10 Segunda Estadística -->
+    <div class="stats-section">
+        <h2 class="section-title">⚡ Top 10 - {{ stat_names[stat2] }}</h2>
+        <div class="top-pokemon-grid">
+            {% for pokemon in top_stat2 %}
+            <div class="top-pokemon-card">
+                <div class="rank-badge">#{{ loop.index }}</div>
+                <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
+                     alt="{{ pokemon.name.en }}">
+                <h3>{{ pokemon.name.en|capitalize if pokemon.name.en and pokemon.name.en != 'none' else ' ' }}</h3>
+                <p class="pokemon-subtitle-small">{{ pokemon.name.es if pokemon.name.es and pokemon.name.es != 'none' else ' ' }}</p>
+                <div class="pokemon-types">
+                    {% for tipo in pokemon.types %}
+                    <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
+                    {% endfor %}
+                </div>
+                <div class="stat-highlight">
+                    <span class="stat-label">{{ stat_names[stat2] }}</span>
+                    <span class="stat-number">{{ pokemon.stat_value }}</span>
                 </div>
                 <a href="{{ url_for('pokemon_detalle', pokemon_id=pokemon.id) }}" class="btn-secondary btn-small">Ver detalles</a>
             </div>
