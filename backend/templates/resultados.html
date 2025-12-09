@@ -23,7 +23,8 @@
                              loading="lazy">
                     </div>
                     
-                    <h3 class="pokemon-name">{{ pokemon.name.es }}</h3>
+                    <h3 class="pokemon-name">{{ pokemon.name.en|capitalize if pokemon.name.en and pokemon.name.en != 'none' else ' ' }}</h3>
+                    <p class="pokemon-subtitle">{{ pokemon.name.es if pokemon.name.es and pokemon.name.es != 'none' else ' ' }}</p>
                     
                     <div class="pokemon-types">
                         {% for tipo in pokemon.types %}
