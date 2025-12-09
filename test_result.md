@@ -111,63 +111,78 @@ user_problem_statement: |
 backend:
   - task: "Admin login con credenciales específicas"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/app.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implementado login especial para admin (hectorbujan@gmail.com / hector2005)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin login successful with correct credentials (hectorbujan@gmail.com/hector2005). Session cookies properly set. Wrong credentials correctly rejected."
 
   - task: "Crear Pokémon inventados (solo admin)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/app.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Ruta /admin/crear_pokemon para crear Pokémon personalizados"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin Pokemon creation working. Successfully created test Pokemon (ID: 10304) with all required fields. Form accessible only with admin session."
 
   - task: "Eliminar Pokémon (solo admin)"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/app.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Ruta /admin/eliminar_pokemon/<id> para eliminar cualquier Pokémon"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin Pokemon deletion working. Successfully deleted test Pokemon (ID: 10304). Requires admin session for authorization."
 
   - task: "API de búsqueda de Pokémon por nombre"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/app.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint /api/buscar mejorado para buscar por nombre en español e inglés"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: API search working perfectly. Tested 'pikachu' (10 results), 'char' (10 results including Charmander family), and non-existent Pokemon (0 results). JSON responses correct."
 
   - task: "Top 10 combinado de dos estadísticas"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/app.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Nueva agregación que suma ambas estadísticas y muestra Top 10 combinado"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Combined statistics working. /estadisticas?stat1=attack&stat2=speed shows combined rankings with both attack and speed stats properly calculated and displayed."
 
 frontend:
   - task: "Botón Crear Pokémon en navbar (solo admin)"
