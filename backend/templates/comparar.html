@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Comparar Pokémon - Pokédex UAX{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">⚔️ Comparador de Pokémon</h1>
+        <p>Selecciona dos Pokémon para comparar sus estadísticas</p>
+    </div>
+
+    <form action="{{ url_for('comparar') }}" method="GET" class="compare-form">
+        <div class="compare-selectors">
+            <div class="selector-group">
+                <label for="id1">Pokémon 1:</label>
+                <select name="id1" id="id1" class="form-select" required>
+                    <option value="">Selecciona un Pokémon</option>
+                    {% for poke in todos_pokemon %}
+                    <option value="{{ poke.id }}" {% if pokemon1 and poke.id == pokemon1.id %}selected{% endif %}>
+                        #{{ '%03d'|format(poke.id) }} - {{ poke.name.es }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="vs-icon">VS</div>
+            
+            <div class="selector-group">
+                <label for="id2">Pokémon 2:</label>
+                <select name="id2" id="id2" class="form-select" required>
+                    <option value="">Selecciona un Pokémon</option>
+                    {% for poke in todos_pokemon %}
+                    <option value="{{ poke.id }}" {% if pokemon2 and poke.id == pokemon2.id %}selected{% endif %}>
+                        #{{ '%03d'|format(poke.id) }} - {{ poke.name.es }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn-primary btn-large">Comparar</button>
+    </form>
+
+    {% if pokemon1 and pokemon2 %}
+    <div class="comparison-result">
+        <div class="compare-grid">
+            <div class="compare-card">
+                <div class="pokemon-image">
+                    <img src="{{ pokemon1.img.official_artwork or pokemon1.img.front_default }}" 
+                         alt="{{ pokemon1.name.es }}">
+                </div>
+                <h2 class="pokemon-name">{{ pokemon1.name.es }}</h2>
+                <div class="pokemon-id">#{{ '%03d'|format(pokemon1.id) }}</div>
+                <div class="pokemon-types">
+                    {% for tipo in pokemon1.types %}
+                    <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="compare-stats">
+                <h2>Estadísticas</h2>
+                <div class="stat-comparison">
+                    <div class="stat-row">
+                        <span class="stat-value-left {{ 'winner' if pokemon1.stats.hp > pokemon2.stats.hp else '' }}">{{ pokemon1.stats.hp }}</span>
+                        <span class="stat-name">HP</span>
+                        <span class="stat-value-right {{ 'winner' if pokemon2.stats.hp > pokemon1.stats.hp else '' }}">{{ pokemon2.stats.hp }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-value-left {{ 'winner' if pokemon1.stats.attack > pokemon2.stats.attack else '' }}">{{ pokemon1.stats.attack }}</span>
+                        <span class="stat-name">Ataque</span>
+                        <span class="stat-value-right {{ 'winner' if pokemon2.stats.attack > pokemon1.stats.attack else '' }}">{{ pokemon2.stats.attack }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-value-left {{ 'winner' if pokemon1.stats.defense > pokemon2.stats.defense else '' }}">{{ pokemon1.stats.defense }}</span>
+                        <span class="stat-name">Defensa</span>
+                        <span class="stat-value-right {{ 'winner' if pokemon2.stats.defense > pokemon1.stats.defense else '' }}">{{ pokemon2.stats.defense }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-value-left {{ 'winner' if pokemon1.stats.special_attack > pokemon2.stats.special_attack else '' }}">{{ pokemon1.stats.special_attack }}</span>
+                        <span class="stat-name">Ataque Esp.</span>
+                        <span class="stat-value-right {{ 'winner' if pokemon2.stats.special_attack > pokemon1.stats.special_attack else '' }}">{{ pokemon2.stats.special_attack }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-value-left {{ 'winner' if pokemon1.stats.special_defense > pokemon2.stats.special_defense else '' }}">{{ pokemon1.stats.special_defense }}</span>
+                        <span class="stat-name">Defensa Esp.</span>
+                        <span class="stat-value-right {{ 'winner' if pokemon2.stats.special_defense > pokemon1.stats.special_defense else '' }}">{{ pokemon2.stats.special_defense }}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-value-left {{ 'winner' if pokemon1.stats.speed > pokemon2.stats.speed else '' }}">{{ pokemon1.stats.speed }}</span>
+                        <span class="stat-name">Velocidad</span>
+                        <span class="stat-value-right {{ 'winner' if pokemon2.stats.speed > pokemon1.stats.speed else '' }}">{{ pokemon2.stats.speed }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="compare-card">
+                <div class="pokemon-image">
+                    <img src="{{ pokemon2.img.official_artwork or pokemon2.img.front_default }}" 
+                         alt="{{ pokemon2.name.es }}">
+                </div>
+                <h2 class="pokemon-name">{{ pokemon2.name.es }}</h2>
+                <div class="pokemon-id">#{{ '%03d'|format(pokemon2.id) }}</div>
+                <div class="pokemon-types">
+                    {% for tipo in pokemon2.types %}
+                    <span class="type-badge type-{{ tipo }}">{{ tipo }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="radar-comparison">
+            <h2>Comparación Gráfica</h2>
+            <canvas id="compareRadar"></canvas>
+        </div>
+    </div>
+    
+    <script>
+    // Gráfico de radar comparativo
+    const ctx = document.getElementById('compareRadar').getContext('2d');
+    const compareRadar = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['HP', 'Ataque', 'Defensa', 'At. Esp.', 'Def. Esp.', 'Velocidad'],
+            datasets: [
+                {
+                    label: '{{ pokemon1.name.es }}',
+                    data: [
+                        {{ pokemon1.stats.hp }},
+                        {{ pokemon1.stats.attack }},
+                        {{ pokemon1.stats.defense }},
+                        {{ pokemon1.stats.special_attack }},
+                        {{ pokemon1.stats.special_defense }},
+                        {{ pokemon1.stats.speed }}
+                    ],
+                    backgroundColor: 'rgba(227, 53, 13, 0.2)',
+                    borderColor: '#E3350D',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#E3350D',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#E3350D'
+                },
+                {
+                    label: '{{ pokemon2.name.es }}',
+                    data: [
+                        {{ pokemon2.stats.hp }},
+                        {{ pokemon2.stats.attack }},
+                        {{ pokemon2.stats.defense }},
+                        {{ pokemon2.stats.special_attack }},
+                        {{ pokemon2.stats.special_defense }},
+                        {{ pokemon2.stats.speed }}
+                    ],
+                    backgroundColor: 'rgba(42, 117, 187, 0.2)',
+                    borderColor: '#2A75BB',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#2A75BB',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#2A75BB'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 255,
+                    ticks: {
+                        stepSize: 50
+                    }
+                }
+            }
+        }
+    });
+    </script>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pokemon.name.es }} - Pokédex UAX{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{{ url_for('buscar') }}" class="btn-back">← Volver a resultados</a>
+    
+    <div class="pokemon-detail">
+        <div class="detail-header">
+            <div class="detail-image">
+                <img src="{{ pokemon.img.official_artwork or pokemon.img.front_default }}" 
+                     alt="{{ pokemon.name.es }}">
+            </div>
+            
+            <div class="detail-info">
+                <div class="pokemon-number">#{{ '%03d'|format(pokemon.id) }}</div>
+                <h1 class="detail-title">{{ pokemon.name.es }}</h1>
+                <p class="detail-subtitle">{{ pokemon.name.en|capitalize }}</p>
+                
+                <div class="pokemon-types">
+                    {% for tipo in pokemon.types %}
+                    <span class="type-badge type-{{ tipo }} type-large">{{ tipo|upper }}</span>
+                    {% endfor %}
+                </div>
+                
+                <div class="badges">
+                    {% if pokemon.is_legendary %}
+                    <span class="badge-legendary badge-large">✨ Legendario</span>
+                    {% endif %}
+                    {% if pokemon.is_mythical %}
+                    <span class="badge-mythical badge-large">🔮 Mítico</span>
+                    {% endif %}
+                </div>
+                
+                {% if user %}
+                    {% if en_equipo %}
+                    <div class="team-status">
+                        <span class="in-team">✅ En tu equipo</span>
+                    </div>
+                    {% else %}
+                    <form action="{{ url_for('agregar_equipo', pokemon_id=pokemon.id) }}" method="POST">
+                        <button type="submit" class="btn-primary btn-large">➕ Añadir a mi equipo</button>
+                    </form>
+                    {% endif %}
+                {% else %}
+                    <p class="login-prompt"><a href="{{ url_for('login') }}">Inicia sesión</a> para guardar este Pokémon en tu equipo</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="detail-sections">
+            <div class="detail-section">
+                <h2>📊 Estadísticas Base</h2>
+                <div class="stats-container">
+                    <div class="stats-bars">
+                        <div class="stat-bar">
+                            <span class="stat-name">HP</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill" style="width: {{ (pokemon.stats.hp / 255 * 100)|round }}%"></div>
+                            </div>
+                            <span class="stat-value">{{ pokemon.stats.hp }}</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-name">Ataque</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill" style="width: {{ (pokemon.stats.attack / 255 * 100)|round }}%"></div>
+                            </div>
+                            <span class="stat-value">{{ pokemon.stats.attack }}</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-name">Defensa</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill" style="width: {{ (pokemon.stats.defense / 255 * 100)|round }}%"></div>
+                            </div>
+                            <span class="stat-value">{{ pokemon.stats.defense }}</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-name">At. Esp.</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill" style="width: {{ (pokemon.stats.special_attack / 255 * 100)|round }}%"></div>
+                            </div>
+                            <span class="stat-value">{{ pokemon.stats.special_attack }}</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-name">Def. Esp.</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill" style="width: {{ (pokemon.stats.special_defense / 255 * 100)|round }}%"></div>
+                            </div>
+                            <span class="stat-value">{{ pokemon.stats.special_defense }}</span>
+                        </div>
+                        <div class="stat-bar">
+                            <span class="stat-name">Velocidad</span>
+                            <div class="stat-progress">
+                                <div class="stat-fill" style="width: {{ (pokemon.stats.speed / 255 * 100)|round }}%"></div>
+                            </div>
+                            <span class="stat-value">{{ pokemon.stats.speed }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="radar-chart">
+                        <canvas id="statsRadar"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h2>📝 Información General</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Altura:</span>
+                        <span class="info-value">{{ (pokemon.height / 10)|round(1) }} m</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Peso:</span>
+                        <span class="info-value">{{ (pokemon.weight / 10)|round(1) }} kg</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Generación:</span>
+                        <span class="info-value">{{ pokemon.generation|replace('generation-', 'Gen ')|upper }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hábitat:</span>
+                        <span class="info-value">{{ pokemon.habitat|capitalize or 'Desconocido' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ratio captura:</span>
+                        <span class="info-value">{{ pokemon.capture_rate }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Exp. base:</span>
+                        <span class="info-value">{{ pokemon.base_experience }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h2>✨ Habilidades</h2>
+                <div class="abilities-list">
+                    {% for habilidad in pokemon.abilities %}
+                    <span class="ability-badge">{{ habilidad|replace('-', ' ')|capitalize }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            {% if pokemon.flavor_text_es %}
+            <div class="detail-section">
+                <h2>📖 Descripción</h2>
+                <p class="flavor-text">{{ pokemon.flavor_text_es }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Gráfico de radar de estadísticas
+const ctx = document.getElementById('statsRadar').getContext('2d');
+const statsRadar = new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: ['HP', 'Ataque', 'Defensa', 'At. Esp.', 'Def. Esp.', 'Velocidad'],
+        datasets: [{
+            label: '{{ pokemon.name.es }}',
+            data: [
+                {{ pokemon.stats.hp }},
+                {{ pokemon.stats.attack }},
+                {{ pokemon.stats.defense }},
+                {{ pokemon.stats.special_attack }},
+                {{ pokemon.stats.special_defense }},
+                {{ pokemon.stats.speed }}
+            ],
+            backgroundColor: 'rgba(227, 53, 13, 0.2)',
+            borderColor: '#E3350D',
+            borderWidth: 2,
+            pointBackgroundColor: '#E3350D',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#E3350D'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+            r: {
+                beginAtZero: true,
+                max: 255,
+                ticks: {
+                    stepSize: 50
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
