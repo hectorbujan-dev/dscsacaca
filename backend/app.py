@@ -207,6 +207,26 @@ def estadisticas():
         }}
     ]))
     
+    # NUEVA AGREGACIÓN: Top 10 combinado (suma de ambas estadísticas)
+    top_combinado = list(pokemon_collection.aggregate([
+        {'$addFields': {
+            'stat1_value': f'$stats.{stat1}',
+            'stat2_value': f'$stats.{stat2}',
+            'combined_score': {'$add': [f'$stats.{stat1}', f'$stats.{stat2}']}
+        }},
+        {'$sort': {'combined_score': -1}},
+        {'$limit': 10},
+        {'$project': {
+            'id': 1,
+            'name': 1,
+            'types': 1,
+            'img': 1,
+            'stat1_value': 1,
+            'stat2_value': 1,
+            'combined_score': 1
+        }}
+    ]))
+    
     # Agregación 2: Promedio de estadísticas por generación
     promedios_gen = list(pokemon_collection.aggregate([
         {'$group': {
@@ -246,13 +266,15 @@ def estadisticas():
     return render_template('estadisticas.html',
                          top_stat1=top_stat1,
                          top_stat2=top_stat2,
+                         top_combinado=top_combinado,
                          stat1=stat1,
                          stat2=stat2,
                          stat_names=stat_names,
                          promedios_gen=promedios_gen,
                          distribucion_tipos=distribucion_tipos,
                          legendarios_gen=legendarios_gen,
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/equipo')
 def equipo():
