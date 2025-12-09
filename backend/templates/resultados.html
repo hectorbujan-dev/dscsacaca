@@ -37,7 +37,17 @@
                     {% elif pokemon.is_mythical %}
                     <span class="badge-mythical">🔮 Mítico</span>
                     {% endif %}
+                    
+                    {% if pokemon.es_inventado %}
+                    <span class="badge-inventado">🎨 Inventado</span>
+                    {% endif %}
                 </a>
+                
+                {% if is_admin %}
+                <form action="{{ url_for('eliminar_pokemon', pokemon_id=pokemon.id) }}" method="POST" class="delete-form" onsubmit="return confirm('¿Seguro que quieres eliminar a {{ pokemon.name.es or pokemon.name.en }}?')">
+                    <button type="submit" class="btn-delete">🗑️ Eliminar</button>
+                </form>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
