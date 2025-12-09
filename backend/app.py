@@ -62,7 +62,8 @@ def index():
                          tipos=sorted(tipos),
                          habitats=sorted([h for h in habitats if h]),
                          generaciones=sorted(generaciones),
-                         user=session.get('user'))
+                         user=session.get('user'),
+                         is_admin=is_admin())
 
 @app.route('/buscar', methods=['GET', 'POST'])
 def buscar():
